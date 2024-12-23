@@ -5,4 +5,3 @@ export default async function TagFilterContainer() {
   const tags = await getTags()
   return <TagFilter tags={tags} />
 }
-

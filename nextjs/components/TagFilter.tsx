@@ -87,4 +87,3 @@ export default function TagFilter({ tags }: { tags: TagCount[] }) {
     </div>
   )
 }
-

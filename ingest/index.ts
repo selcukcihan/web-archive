@@ -1,14 +1,12 @@
 import { extractTags, summarize } from "./ai";
 import { extractHtmlMetaData } from "./html";
-import { addLink, getUnprocessedLinks, updateLink } from "./db";
+import { addLink, getUnprocessedLinks, updateLink, storeImageOnS3 } from "./db";
 
 const links = [
   "https://www.allthingsdistributed.com/2024/12/tech-predictions-for-2025-and-beyond.html",
   "https://netflixtechblog.com/netflixs-distributed-counter-abstraction-8d0c45eb66b2",
   "https://aws.amazon.com/blogs/aws/top-announcements-of-aws-reinvent-2024/"
 ]
-
-console.log(process.env);
 
 const runLoop = async () => {
   for (const link of links) {
@@ -28,11 +26,13 @@ const runLoop = async () => {
     }
     const summary = await summarize(link.link);
     const tags = await extractTags(link.link);
+    const imageLink = metadata.image ? await storeImageOnS3(metadata.image) : undefined;
+
     console.log(`Saving ${link.link}`);
     await updateLink(link.link, {
       title: metadata.title,
       summary,
-      image: metadata.image,
+      image: imageLink || '',
       tags,
     });
   }

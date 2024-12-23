@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
 import { ExternalLink, Info } from 'lucide-react'
-import { Link } from '@/lib/data'
 import {
   Dialog,
   DialogContent,
@@ -12,15 +10,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { WebPage } from '../../ingest/db'
 
-export default function LinkCard({ link }: { link: Link }) {
-  // const [isHovered, setIsHovered] = useState(false) // Removed isHovered state
-
+export default function LinkCard({ link }: { link: WebPage }) {
   return (
     <div 
-      className="bg-zinc-800/50 rounded-lg p-4 relative" // Removed hover className
-      // onMouseEnter={() => setIsHovered(true)} // Removed onMouseEnter
-      // onMouseLeave={() => setIsHovered(false)} // Removed onMouseLeave
+      className="bg-zinc-800/50 rounded-lg p-4 relative"
     >
       <div className="flex items-start space-x-4">
         {link.image && (
@@ -37,7 +32,7 @@ export default function LinkCard({ link }: { link: Link }) {
           <div className="flex items-start justify-between gap-2 mb-2">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <a 
-                href={link.url}
+                href={link.link}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-emerald-400 truncate"
@@ -109,7 +104,6 @@ export default function LinkCard({ link }: { link: Link }) {
           </div>
         </div>
       </div>
-      {/* Removed hover summary div */}
     </div>
   )
 }

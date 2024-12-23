@@ -1,39 +1,12 @@
-import { links, Link } from './data'
+import { getLinks as getLinksFromDb, getTags as getTagsFromDb, WebPage, Tag } from "../../ingest/db";
 
-const ITEMS_PER_PAGE = 10
-
-export async function getLinks(tag?: string | null, page: number = 1): Promise<{ links: Link[], totalPages: number }> {
-  let filteredLinks = tag ? links.filter(link => link.tags.includes(tag)) : links;
+export async function getLinks(tag?: string, page: number = 1): Promise<{ links: WebPage[], totalPages: number }> {
+  const { links, totalPages } = await getLinksFromDb(tag, page - 1);
   
-  const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  
-  const paginatedLinks = filteredLinks.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredLinks.length / ITEMS_PER_PAGE);
-
-  return { links: paginatedLinks, totalPages };
+  return { links, totalPages };
 }
 
-interface TagCount {
-  tag: string;
-  count: number;
-}
-
-export async function getTags(): Promise<TagCount[]> {
+export async function getTags(): Promise<Tag[]> {
   const tagCounts: { [key: string]: number } = {};
-  
-  // Count occurrences of each tag
-  links.forEach(link => {
-    link.tags.forEach(tag => {
-      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-    });
-  });
-
-  // Convert to array and sort by count descending
-  const sortedTags = Object.entries(tagCounts)
-    .map(([tag, count]) => ({ tag, count }))
-    .sort((a, b) => b.count - a.count);
-
-  return sortedTags;
+  return await getTagsFromDb();
 }
-

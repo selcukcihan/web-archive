@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server'
-import { links } from '@/lib/data'
+import { getLinks } from '../../../lib/api';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const tag = searchParams.get('tag')
 
-  let filteredLinks = links;
   if (tag) {
-    filteredLinks = links.filter(link => link.tags.includes(tag));
+    const links = await getLinks(tag);
+    return NextResponse.json(links);
+  } else {
+    const links = await getLinks();
+    return NextResponse.json(links);
   }
-
-  return NextResponse.json(filteredLinks)
 }
-

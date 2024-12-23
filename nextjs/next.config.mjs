@@ -4,23 +4,9 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "nextjs.org",
-        port: "",
-        pathname: "*/*",
-        search: "",
-      },
-      {
-        protocol: "https",
-        hostname: "react.dev",
+        hostname: "web-archive-for-all.s3.amazonaws.com",
         port: "",
         pathname: "/images/*",
-        search: "",
-      },
-      {
-        protocol: "https",
-        hostname: "www.typescriptlang.org",
-        port: "",
-        pathname: "/images/*/*",
         search: "",
       },
     ],
