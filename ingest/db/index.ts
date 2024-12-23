@@ -188,7 +188,7 @@ export const getLinks = async (tagFilter: string | undefined, page: number) => {
   return {
     links: (linkResponses.filter((link) => link !== undefined) as WebPage[])
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-    totalPages: links.length / PAGE_SIZE
+    totalPages: Math.ceil(links.length / PAGE_SIZE)
   };
 }
 
