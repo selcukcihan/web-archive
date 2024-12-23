@@ -20,7 +20,12 @@ The app should let me filter web pages by tag and also let me see and search thr
 The app should let me add a new web page by providing its link.
 ```
 
-## Data Model
+## Data
+
+* Web page data is stored in DynamoDB.
+* Image thumbnails shown for each link are stored in S3.
+
+### Model
 
 `WebPage`
   - id
@@ -35,19 +40,41 @@ The app should let me add a new web page by providing its link.
   - id
   - name
 
-## Data Access Patterns
+### Access Patterns
 
-### Get Web Page By ID
+#### Get Web Page By ID
 
 Most basic use case, given an ID of `WebPage` fetch the corresponding record.
 
 We won't need this right away, I think the listing api is just enough for now.
 
-### List & Filter Web Pages
+#### List & Filter Web Pages
 
 * You can list all the web pages, sorted by date of addition.
 * You can also filter on tags, so you can ask for `all web pages that are tagged "cloud computing"`, again sorted by date of addition.
 
-### List Tags
+To serve these queries, we'll need an index of web pages with the following info for each entry:
+
+1. WebPage ID
+2. List of tag IDs
+
+sorted by date of addition.
+
+#### List Tags
 
 We need to show a list of tags to choose from, when listing web pages.
+
+## Architecture
+
+The UI and server side nextjs app are hosted on vercel.
+
+NextJS backend accesses directly to DynamoDB & S3.
+
+### Data Ingestion & Processing
+
+There's a script that iterates through DynamoDB and summarizes/tags links that are not yet processed.
+The script also uploads thumbnail images to S3.
+
+There's another script that inserts a new link to DynamoDB.
+
+These scripts are not automated yet, I run them as I bump into articles I want to save for later.
