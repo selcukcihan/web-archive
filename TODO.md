@@ -1,1 +1,2 @@
 - Backfill some data
+- Improve the way summary is shown. We should probably cap the summary at a certain length when asking the ai. Mobile should show a scroll and fit the dialog to the screen.
