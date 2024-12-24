@@ -157,7 +157,7 @@ export async function getTags(): Promise<Tag[]> {
   }));
   const tags = result.Items?.map((item) => ({
     tag: item.sk.S?.split("#")[1] as string,
-    count: item.links.SS?.length as number,
+    count: item.links.L?.length as number,
   })) ?? [];
   return tags.sort((a, b) => b.count - a.count);
 }
@@ -188,7 +188,8 @@ export const getLinks = async (tagFilter: string | undefined, page: number) => {
   return {
     links: (linkResponses.filter((link) => link !== undefined) as WebPage[])
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-    totalPages: Math.ceil(links.length / PAGE_SIZE)
+    totalPages: Math.ceil(links.length / PAGE_SIZE),
+    totalLinks: links.length,
   };
 }
 
