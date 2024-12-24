@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { WebPage } from '../../ingest/db'
+import { WebPage } from '../db'
 
 export default function LinkCard({ link }: { link: WebPage }) {
   // const [isHovered, setIsHovered] = useState(false) // Removed isHovered state

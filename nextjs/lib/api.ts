@@ -1,4 +1,4 @@
-import { getLinks as getLinksFromDb, getTags as getTagsFromDb, WebPage, Tag } from "../../ingest/db";
+import { getLinks as getLinksFromDb, getTags as getTagsFromDb, WebPage, Tag } from "../db";
 
 export async function getLinks(tag?: string, page: number = 1): Promise<{ links: WebPage[], totalPages: number }> {
   const { links, totalPages } = await getLinksFromDb(tag, page - 1);
