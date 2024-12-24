@@ -1,6 +1,8 @@
 import { Suspense } from 'react'
 import LinkList from '@/components/LinkList'
 import TagFilterContainer from '@/components/TagFilterContainer'
+import Footer from '@/components/Footer'
+import Logo from '@/components/Logo'
 
 export default function Home({
   searchParams,
@@ -11,11 +13,10 @@ export default function Home({
   const page = Number(searchParams.page) || 1
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-zinc-300 font-mono">
-      <main className="container mx-auto p-4">
+    <div className="min-h-screen bg-zinc-900 text-zinc-300 font-mono flex flex-col">
+      <main className="container mx-auto p-4 flex-1">
         <h1 className="text-2xl font-bold mb-6 border-b border-zinc-800 pb-2">
-          <span className="text-emerald-600">&gt; </span>
-          Web Archive
+          <Logo />
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-1">
@@ -49,6 +50,7 @@ export default function Home({
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   )
 }
