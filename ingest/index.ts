@@ -3,7 +3,8 @@ import { extractHtmlMetaData } from "./html";
 import { addLink, getUnprocessedLinks, updateLink, storeImageOnS3 } from "../nextjs/db";
 
 const link = process.argv[3];
-console.log(`Processing ${link}`);
+console.log(`Archiving ${link}`);
+
 const runLoop = async () => {
   await addLink(link);
   const unprocessed = await getUnprocessedLinks();

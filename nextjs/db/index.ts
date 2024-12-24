@@ -1,7 +1,33 @@
 import { DynamoDBClient, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { DeleteCommand, DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 // import normalizeUrl from "normalize-url";
+
+/*
+DynamoDB entities used in this project:
+- unprocessed
+  - link#{link}
+    - link: string
+    - originalUrl: string
+
+- web-page#{link}
+  - web-page
+    - title: string
+    - summary: string
+    - image: string
+    - tags: string[]
+    - createdAt: string
+    - link: string
+    - originalUrl: string
+
+- processed
+  - all
+    - links: string[]
+
+- tags
+  - tag#{tag}
+    - links: string[]
+*/
 
 const PAGE_SIZE = parseInt(process.env.PAGE_SIZE ?? "10");
 
@@ -40,6 +66,15 @@ export interface Tag {
   count: number;
 }
 
+const checkUrl = (url: string) => {
+  try {
+    new URL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 /**
  * Add an unprocessed web page to the database
  * @param link link of the web page
@@ -49,6 +84,9 @@ export const addLink = async (originalUrl: string) => {
   const link = originalUrl;
   const existing = await getLink(link);
   if (existing) {
+    return;
+  }
+  if (!checkUrl(link)) {
     return;
   }
   await ddbDocClient.send(new UpdateCommand({
@@ -61,6 +99,56 @@ export const addLink = async (originalUrl: string) => {
     ExpressionAttributeValues: {
       ":link": link,
       ":originalUrl": originalUrl,
+    },
+  }));
+}
+
+export const removeLink = async (link: string) => {
+  const existing = await getLink(link);
+  if (!existing) {
+    return;
+  }
+  await s3.send(new DeleteObjectCommand({
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: existing.image.replace(`https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/`, ""),
+  }));
+
+  await ddbDocClient.send(new DeleteCommand({
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    Key: {
+      pk: `web-page#${link}`,
+      sk: `web-page`,
+    },
+  }));
+  for (const tag of existing.tags) {
+    await ddbDocClient.send(new UpdateCommand({
+      TableName: process.env.DYNAMODB_TABLE_NAME,
+      Key: {
+        pk: `tags`,
+        sk: `tag#${tag}`,
+      },
+      UpdateExpression: "DELETE #link :link",
+      ExpressionAttributeNames: {
+        "#link": "links",
+      },
+      ExpressionAttributeValues: {
+        ":link": new Set([link]),
+      },
+    }));
+  }
+
+  await ddbDocClient.send(new UpdateCommand({
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    Key: {
+      pk: `processed`,
+      sk: `all`,
+    },
+    UpdateExpression: `DELETE #link :link`,
+    ExpressionAttributeNames: {
+      "#link": "links",
+    },
+    ExpressionAttributeValues: {
+      ":link": new Set([link]),
     },
   }));
 }
@@ -109,13 +197,12 @@ export const updateLink = async (link: string, details: WebPageDetails) => {
       pk: `processed`,
       sk: `all`,
     },
-    UpdateExpression: "SET #link = list_append(if_not_exists(#link, :emptyList), :newLink)",
+    UpdateExpression: "ADD #link :newLink",
     ExpressionAttributeNames: {
       "#link": "links",
     },
     ExpressionAttributeValues: {
-      ":newLink": [link],
-      ":emptyList": [],
+      ":newLink": new Set([link]),
     },
   }));
 
@@ -126,13 +213,12 @@ export const updateLink = async (link: string, details: WebPageDetails) => {
         pk: `tags`,
         sk: `tag#${tag}`,
       },
-      UpdateExpression: "SET #link = list_append(if_not_exists(#link, :emptyList), :newLink)",
+      UpdateExpression: "ADD #link :newLink",
       ExpressionAttributeNames: {
         "#link": "links",
       },
       ExpressionAttributeValues: {
-        ":newLink": [link],
-        ":emptyList": [],
+        ":newLink": new Set([link]),
       },
     }));
   }
@@ -154,10 +240,11 @@ export async function getTags(): Promise<Tag[]> {
       ":pk": { S: `tags`},
       ":sk": { S: `tag#` },
     },
+    FilterExpression: "attribute_exists(links)",
   }));
   const tags = result.Items?.map((item) => ({
     tag: item.sk.S?.split("#")[1] as string,
-    count: item.links.L?.length as number,
+    count: item.links.SS?.length as number,
   })) ?? [];
   return tags.sort((a, b) => b.count - a.count);
 }

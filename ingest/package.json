@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "archive": "ts-node -r dotenv/config index.ts dotenv_config_path=./../.env.local",
+    "unarchive": "ts-node -r dotenv/config unarchive.ts dotenv_config_path=./../.env.local",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
