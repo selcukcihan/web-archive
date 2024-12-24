@@ -7,6 +7,5 @@ export async function getLinks(tag?: string, page: number = 1): Promise<{ links:
 }
 
 export async function getTags(): Promise<Tag[]> {
-  const tagCounts: { [key: string]: number } = {};
   return await getTagsFromDb();
 }
