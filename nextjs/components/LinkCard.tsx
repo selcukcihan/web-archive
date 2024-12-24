@@ -13,9 +13,13 @@ import { Button } from "@/components/ui/button"
 import { WebPage } from '../../ingest/db'
 
 export default function LinkCard({ link }: { link: WebPage }) {
+  // const [isHovered, setIsHovered] = useState(false) // Removed isHovered state
+
   return (
     <div 
-      className="bg-zinc-800/50 rounded-lg p-4 relative"
+      className="bg-zinc-800/50 rounded-lg p-4 relative" // Removed hover className
+      // onMouseEnter={() => setIsHovered(true)} // Removed onMouseEnter
+      // onMouseLeave={() => setIsHovered(false)} // Removed onMouseLeave
     >
       <div className="flex items-start space-x-4">
         {link.image && (
@@ -30,14 +34,15 @@ export default function LinkCard({ link }: { link: WebPage }) {
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-2">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
+            <h2 className="text-lg font-semibold flex items-center gap-2 max-w-[calc(100%-80px)]">
               <a 
                 href={link.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-emerald-400 truncate"
+                className="hover:text-emerald-400 truncate block"
+                title={link.title} // Add full title as tooltip
               >
-                {link.title}
+                {link.title.length > 80 ? `${link.title.substring(0, 80)}...` : link.title}
               </a>
               <ExternalLink className="w-4 h-4 flex-shrink-0 text-zinc-500" />
             </h2>
@@ -104,6 +109,7 @@ export default function LinkCard({ link }: { link: WebPage }) {
           </div>
         </div>
       </div>
+      {/* Removed hover summary div */}
     </div>
   )
 }
