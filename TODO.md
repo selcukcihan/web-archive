@@ -1,3 +1,1 @@
-- Add favicon and logo
-- Deploy on vercel
 - Backfill some data

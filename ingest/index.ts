@@ -1,6 +1,6 @@
 import { extractTags, summarize } from "./ai";
 import { extractHtmlMetaData } from "./html";
-import { addLink, getUnprocessedLinks, updateLink, storeImageOnS3 } from "./db";
+import { addLink, getUnprocessedLinks, updateLink, storeImageOnS3 } from "../nextjs/db";
 
 const link = process.argv[3];
 console.log(`Processing ${link}`);
