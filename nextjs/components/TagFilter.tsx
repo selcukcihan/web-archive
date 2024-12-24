@@ -14,6 +14,7 @@ export default function TagFilter({ tags }: { tags: TagCount[] }) {
   const searchParams = useSearchParams()
   const [search, setSearch] = useState('')
   const [isExpanded, setIsExpanded] = useState(false)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   const handleTagClick = (tag: string) => {
     const params = new URLSearchParams(searchParams)
@@ -26,16 +27,17 @@ export default function TagFilter({ tags }: { tags: TagCount[] }) {
     tag.toLowerCase().includes(search.toLowerCase())
   )
 
-  const displayedTags = isExpanded ? filteredTags : filteredTags.slice(0, 10)
-  const hasMoreTags = filteredTags.length > 10
+  const initialTagCount = isMobile ? 3 : 10
+  const displayedTags = isExpanded ? filteredTags : filteredTags.slice(0, initialTagCount)
+  const hasMoreTags = filteredTags.length > initialTagCount
 
   return (
-    <div className="bg-zinc-800/50 rounded-lg p-4">
-      <h2 className="text-base font-semibold mb-4 flex items-center text-zinc-400">
+    <div className="bg-zinc-800/50 rounded-lg p-3 sm:p-4">
+      <h2 className="text-base font-semibold mb-3 sm:mb-4 flex items-center text-zinc-400">
         <Hash className="w-4 h-4 mr-2" />
         <span>Tags</span>
       </h2>
-      <div className="relative mb-4">
+      <div className="relative mb-3 sm:mb-4">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-500" />
         <input
           type="text"
@@ -44,7 +46,7 @@ export default function TagFilter({ tags }: { tags: TagCount[] }) {
           placeholder="Search tags..."
           className="w-full pl-10 pr-4 py-2 bg-zinc-900/50 rounded-md 
                    text-zinc-300 placeholder-zinc-500 focus:outline-none 
-                   focus:ring-1 focus:ring-zinc-700"
+                   text-sm focus:ring-1 focus:ring-zinc-700"
         />
       </div>
       <div className="space-y-1">
@@ -52,7 +54,7 @@ export default function TagFilter({ tags }: { tags: TagCount[] }) {
           <button
             key={tag}
             onClick={() => handleTagClick(tag)}
-            className="flex justify-between items-center w-full px-3 py-2 text-left 
+            className="flex justify-between items-center w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-left 
                      hover:bg-zinc-700/50 rounded-md group transition-colors duration-200"
           >
             <span className="truncate text-sm">
@@ -67,7 +69,7 @@ export default function TagFilter({ tags }: { tags: TagCount[] }) {
       {hasMoreTags && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center justify-center w-full mt-4 px-3 py-2 
+          className="flex items-center justify-center w-full mt-3 sm:mt-4 px-3 py-1.5 sm:py-2 
                    text-xs text-zinc-400 hover:text-zinc-300 
                    hover:bg-zinc-700/50 rounded-md transition-colors duration-200"
         >
@@ -79,7 +81,7 @@ export default function TagFilter({ tags }: { tags: TagCount[] }) {
           ) : (
             <>
               <ChevronDown className="h-3 w-3 mr-1" />
-              Show More ({filteredTags.length - 10})
+              Show More ({filteredTags.length - initialTagCount})
             </>
           )}
         </button>

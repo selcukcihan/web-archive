@@ -24,36 +24,36 @@ export default function Pagination({ currentPage, totalPages, totalLinks }: Pagi
   const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalLinks)
 
   return (
-    <div className="flex justify-between items-center mt-6">
-      <span className="text-xs text-zinc-500">
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-4 sm:mt-6">
+      <span className="text-xs text-zinc-500 order-2 sm:order-1">
         Showing {startItem}-{endItem} of {totalLinks}
       </span>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2 sm:space-x-4 order-1 sm:order-2">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-1.5 rounded-md text-sm
+          className="px-2 sm:px-3 py-1.5 rounded-md text-sm
                    disabled:opacity-50 disabled:cursor-not-allowed
                    hover:bg-zinc-800 transition-colors duration-200
                    flex items-center gap-1 text-zinc-400 hover:text-zinc-300"
           aria-label="Previous page"
         >
           <ChevronLeft className="w-4 h-4" />
-          prev
+          <span className="hidden sm:inline">prev</span>
         </button>
         <span className="text-xs font-normal text-zinc-500">
-          Page {currentPage} of {totalPages}
+          {currentPage}/{totalPages}
         </span>
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1.5 rounded-md text-sm
+          className="px-2 sm:px-3 py-1.5 rounded-md text-sm
                    disabled:opacity-50 disabled:cursor-not-allowed
                    hover:bg-zinc-800 transition-colors duration-200
                    flex items-center gap-1 text-zinc-400 hover:text-zinc-300"
           aria-label="Next page"
         >
-          next
+          <span className="hidden sm:inline">next</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
