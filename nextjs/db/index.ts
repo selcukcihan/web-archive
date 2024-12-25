@@ -136,7 +136,7 @@ export const removeLink = async (link: string) => {
         "#link": "links",
       },
       ExpressionAttributeValues: {
-        ":link": new Set([link]),
+        ":link": new Set([getSortableLink(existing.createdAt, link)]),
       },
     }));
   }
@@ -222,7 +222,7 @@ export const updateLink = async (link: string, details: WebPageDetails) => {
         "#link": "links",
       },
       ExpressionAttributeValues: {
-        ":newLink": new Set([link]),
+        ":newLink": new Set([getSortableLink(createdAt, link)]),
       },
     }));
   }
@@ -272,10 +272,12 @@ export const getLinks = async (tagFilter: string | undefined, page: number) => {
         sk: `all`,
       },
     }));
-    links = [...(result.Item?.links ?? [])]
-      .sort((a, b) => a > b ? -1 : 1)
-      .map((sortableLink: string) => sortableLink.split("#")[1]);
+    links = [...(result.Item?.links ?? [])];
   }
+  links = links
+    .sort((a, b) => a > b ? -1 : 1)
+    .map((sortableLink: string) => sortableLink.split("#")[1]);
+
   const linksInPage = links.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   const linkResponses = await Promise.all(linksInPage.map((url) => getLink(url)));
   return {
