@@ -75,6 +75,10 @@ const checkUrl = (url: string) => {
   }
 }
 
+const getSortableLink = (createdAt: string, url: string) => {
+  return `${createdAt}#${url}`;
+}
+
 /**
  * Add an unprocessed web page to the database
  * @param link link of the web page
@@ -148,7 +152,7 @@ export const removeLink = async (link: string) => {
       "#link": "links",
     },
     ExpressionAttributeValues: {
-      ":link": new Set([link]),
+      ":link": new Set([getSortableLink(existing.createdAt, link)]),
     },
   }));
 }
@@ -202,7 +206,7 @@ export const updateLink = async (link: string, details: WebPageDetails) => {
       "#link": "links",
     },
     ExpressionAttributeValues: {
-      ":newLink": new Set([link]),
+      ":newLink": new Set([getSortableLink(createdAt, link)]),
     },
   }));
 
@@ -250,7 +254,7 @@ export async function getTags(): Promise<Tag[]> {
 }
 
 export const getLinks = async (tagFilter: string | undefined, page: number) => {
-  const links = [];
+  let links: string[] = [];
   if (tagFilter !== undefined) {
     const result = await ddbDocClient.send(new GetCommand({
       TableName: process.env.DYNAMODB_TABLE_NAME,
@@ -259,7 +263,7 @@ export const getLinks = async (tagFilter: string | undefined, page: number) => {
         sk: `tag#${tagFilter}`,
       },
     }));
-    links.push(...(result.Item?.links ?? []));
+    links = [...(result.Item?.links ?? [])];
   } else {
     const result = await ddbDocClient.send(new GetCommand({
       TableName: process.env.DYNAMODB_TABLE_NAME,
@@ -268,7 +272,9 @@ export const getLinks = async (tagFilter: string | undefined, page: number) => {
         sk: `all`,
       },
     }));
-    links.push(...(result.Item?.links ?? []));
+    links = [...(result.Item?.links ?? [])]
+      .sort((a, b) => a > b ? -1 : 1)
+      .map((sortableLink: string) => sortableLink.split("#")[1]);
   }
   const linksInPage = links.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   const linkResponses = await Promise.all(linksInPage.map((url) => getLink(url)));
