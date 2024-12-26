@@ -1,4 +1,4 @@
-import { getLinks } from '@/lib/api'
+import { getLinks } from '@/lib/data'
 import LinkCard from './LinkCard'
 import Pagination from './Pagination'
 
