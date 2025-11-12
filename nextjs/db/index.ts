@@ -30,14 +30,20 @@ DynamoDB entities used in this project:
 */
 
 const PAGE_SIZE = parseInt(process.env.PAGE_SIZE ?? "10");
+const credentials = {
+  accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID ?? process.env.AWS_ACCESS_KEY_ID ?? "",
+  secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY ?? process.env.AWS_SECRET_ACCESS_KEY ?? "",
+};
 
 const client = new DynamoDBClient({
   region: "eu-west-1",
+  credentials,
 });
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 const s3 = new S3Client({
   region: "eu-west-1",
+  credentials,
 });
 
 export interface WebPageDetails {
@@ -322,5 +328,5 @@ export const storeImageOnS3 = async (imageUrl: string) => {
     ACL: "public-read",
   }));
 
-  return `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/images/${base64}`;
+  return ` images/${base64}`;
 }
